@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Text,
     HStack,
@@ -10,19 +10,39 @@ import {
     Button,
     Input
 } from "native-base";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity } from "react-native";
 import Todo from "../components/Todo";
+import { API, setAuthToken } from "../config/api";
 import LoginIcon from "../components/LoginIcon";
 
-
-const config = {
-    useSystemColorMode: false,
-    initialColorMode: "dark",
-};
-
-
-
 export default function Login({ navigation }) {
+    const [dataRegister, setDataRegister] = useState({
+        email: "",
+        password: "",
+      });
+      
+      function handleChangeText(name, value) {
+        console.log("punya", name, "isinya", value);
+        setDataRegister({
+          ...dataRegister,
+          [name]: value,
+        });
+      }
+      
+      async function handleSubmit(e) {
+          e.preventDefault()
+          try {
+          const response = await API.post("auth/login", dataRegister);
+          AsyncStorage.setItem("token", response.data.token); 
+             console.log(response.data)
+             setAuthToken(response.data.token); 
+             navigation.navigate("listtodo")
+          }catch(err) {
+              console.log(err)
+          }
+      }
+  
     return (
         <NativeBaseProvider>
             <Center
@@ -42,6 +62,7 @@ export default function Login({ navigation }) {
                             bold
                             bg="muted.200"
                             size="md"
+                            onChangeText={(value) => handleChangeText("email", value)}
                         />
                     </FormControl>
                     <FormControl >
@@ -51,9 +72,10 @@ export default function Login({ navigation }) {
                             bold
                             bg="muted.200"
                             size="md"
+                            onChangeText={(value) => handleChangeText("password", value)}
                         />
                     </FormControl>
-                    <Button variant="danger" bg="error.600" w="100%" mt="10" onPress={() => navigation.navigate('listtodo')}>
+                    <Button variant="danger" bg="error.600" w="100%" mt="10" onPress={handleSubmit}>
                         <Text bold color="white">Login</Text>
                     </Button>
 

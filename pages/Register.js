@@ -18,8 +18,36 @@ import { API } from "../config/api";
 // Define the config
 
 export default function Register({ navigation }) {
-  return (
-    <NativeBaseProvider>
+    const config = {
+      useSystemColorMode: false,
+      initialColorMode: "dark",
+    };
+    
+    const [dataRegister, setDataRegister] = useState({
+      firstName: "",
+      email: "",
+      password: "",
+    });
+    
+    function handleChangeText(name, value) {
+      setDataRegister({
+        ...dataRegister,
+        [name]: value,
+      });
+    }
+    
+    async function handleSubmit(e) {
+        e.preventDefault()
+        try {
+        const response = await API.post("auth/register", dataRegister);
+           console.log(response.data)
+           navigation.navigate("login")
+        }catch(err) {
+            console.log(err)
+        }
+    }
+    return (
+        <NativeBaseProvider>
       <Center
         _dark={{ bg: "blueGray.900" }}
         _light={{ bg: "blueGray.50" }}
@@ -39,6 +67,7 @@ export default function Register({ navigation }) {
               placeholder="Email"
               bold
               bg="muted.200"
+              onChangeText={(value) => handleChangeText("email", value)}
             />
           </FormControl>
           <FormControl mb="3">
@@ -48,6 +77,7 @@ export default function Register({ navigation }) {
               bold
               bg="muted.200"
               size="md"
+              onChangeText={(value) => handleChangeText("firstName", value)}
             />
           </FormControl>
           <FormControl>
@@ -57,6 +87,7 @@ export default function Register({ navigation }) {
               bold
               bg="muted.200"
               size="md"
+              onChangeText={(value) => handleChangeText("password", value)}
             />
           </FormControl>
           <Button
@@ -64,7 +95,7 @@ export default function Register({ navigation }) {
             bg="error.600"
             w="100%"
             mt="10"
-            onPress={() => navigation.navigate("listtodo")}
+            onPress={(e) => handleSubmit(e)}
           >
             <Text bold color="white">
               Register

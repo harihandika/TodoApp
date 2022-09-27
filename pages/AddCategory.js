@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Text,
   Link,
@@ -11,51 +13,106 @@ import {
   Input,
   Select,
   Box,
+  ScrollView,
   TextArea
 } from "native-base";
 import Todo from "../components/Todo";
-import LoginIcon from "../components/LoginIcon";
+import { API, setAuthToken } from "../config/api";
 
-// Define the config
-const config = {
-  useSystemColorMode: false,
-  initialColorMode: "dark",
-};
+export default function AddCategory({navigation}) {
+  const [dataCategory, setDataCategory] = useState({
+    name: "",
+  });
+  function handleChangeText(name, value) {
+    setDataCategory({
+      ...dataCategory,
+      [name]: value,
+    });
+    console.log("ini cate",dataCategory);
+  }
+  async function handleSubmit(e) {
+    e.preventDefault();
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await API.post("/category", dataCategory, {
+        headers: {
+          Authorization: `Bearer 7c64bc28c4492d2071df79ad56d2d3bf`,
+        },
+      });
+      navigation.navigate("category");
+    } catch (err) {
+      console.log("gagal");
+    }
+  }
 
-export default function AddCategory() {
+  const [categories, setCategories] = useState([]);
+
+  const getCategory = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await API.get("/category", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response)
+      setCategories(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+console.log("ini", categories);
+  useEffect(() => {
+    getCategory();
+  }, [categories]);
+
   return (
-    <NativeBaseProvider >
-      <Center ml="10" mr="10">
-        <VStack space={2} alignItems="" w="100%">
-          <HStack alignItems="start" mt="5">
-            <Text fontSize="3xl" bold my="5">
-              Add Category
-            </Text>
+    <>
+      <VStack space={1} mx="5" my="2">
+        <Text fontSize="24" fontWeight="bold">
+          Add Category
+        </Text>
+
+        {/* input category */}
+        <FormControl my="5">
+          <Input
+            placeholder="Category"
+            backgroundColor="gray.200"
+            placeholderTextColor="black"
+            size="md"
+            onChangeText={(value) => handleChangeText("name", value)}
+          />
+        </FormControl>
+
+        {/* tombol kategori */}
+        <Button colorScheme="pink" onPress={handleSubmit}>
+          <Text fontSize="20" fontWeight="bold" color="white">
+            {" "}
+            Add Category{" "}
+          </Text>
+        </Button>
+      </VStack>
+
+      {/* list category */}
+      <Text fontSize="24" fontWeight="bold" mx="5" my="2">
+        List Category
+      </Text>
+      <ScrollView>
+        <VStack space={1} mx="5" my="1" maxW="xs">
+          <HStack space={2} my="2" maxWidth="xs" flexWrap="wrap">
+            {/* <Flex > */}
+            {categories.map((item) => (
+              <Box backgroundColor="blue.300" borderRadius={4} my="3">
+                <Text mx="3" my="2" bold color="white">
+                  {item.name}
+                </Text>
+              </Box>
+            ))}
+            {/* </Flex> */}
           </HStack>
-          <FormControl my="3">
-            <Input
-              type="text"
-              placeholder="Name"
-              bold
-              bg="muted.200"
-              size="md"
-            />
-          </FormControl>
-          <Button variant="danger" bg="error.600" w="100%" mt="" color="white">
-            <Text bold color="white">
-              Add List
-            </Text>
-          </Button>
-          <Text fontSize="2xl" bold my="5">
-            List Category
-          </Text>
-          <Text>
-            <Button variant="danger" bg="primary.300" color="white" mr="2" borderRadius="10">Study</Button>
-            <Button variant="danger" bg="error.400" color="white" mr="2" borderRadius="10">Home Work</Button>
-            <Button variant="danger" bg="warning.400" color="white" borderRadius="10">Workout</Button>
-          </Text>
         </VStack>
-      </Center>
-    </NativeBaseProvider>
+      </ScrollView>
+      {/* <Footer /> */}
+    </>
   );
-}
+};
