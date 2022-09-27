@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   Text,
   Link,
@@ -15,14 +16,57 @@ import {
 } from "native-base";
 import Todo from "../components/Todo";
 import LoginIcon from "../components/LoginIcon";
-
-// Define the config
-const config = {
-  useSystemColorMode: false,
-  initialColorMode: "dark",
-};
+import { API, setAuthToken } from "../config/api";
 
 export default function AddList() {
+  const [dataList, setDataList] = useState({
+    name: "",
+    description:"",
+    date:"",
+    category:"",
+  });
+  function handleChangeText(name, value) {
+    setDataList({
+      ...dataList,
+      [name]: value,
+    });
+    console.log("ini cate",dataList);
+  }
+  async function handleSubmit(e) {
+    e.preventDefault();
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await API.post("/list", dataList, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      navigation.navigate("listtodo");
+    } catch (err) {
+      console.log("gagal");
+    }
+  }
+  
+  const [list, setList] = useState([]);
+  
+  const getList = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await API.get("/list", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response)
+      setList(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  console.log("ini", list);
+  useEffect(() => {
+    getList();
+  }, []);
   return (
     <>
     <NativeBaseProvider >

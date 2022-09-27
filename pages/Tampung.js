@@ -28,6 +28,7 @@ export default function AddCategory({navigation}) {
       ...dataCategory,
       [name]: value,
     });
+    console.log("ini cate",dataCategory);
   }
   async function handleSubmit(e) {
     e.preventDefault();
@@ -54,11 +55,13 @@ export default function AddCategory({navigation}) {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log(response)
       setCategories(response.data);
     } catch (error) {
       console.log(error);
     }
   };
+console.log("ini", categories);
   useEffect(() => {
     getCategory();
   }, [categories]);
