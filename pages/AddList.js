@@ -84,14 +84,15 @@ export default function AddList() {
               bold
               bg="muted.200"
               size="md"
+              onChangeText={(value) => handleChangeText("name", value)}
             />
           </FormControl>
-          <FormControl w="100%" bg="muted.200">
+          <FormControl w="100%" bg="muted.200" name="category" onChangeText={(value) => handleChangeText("category", value)}>
             <Select minWidth="200" placeholder="Category" mt="1">
-              <Select.Item label="Full Stack" value="full" />
-              <Select.Item label="Web Development" value="web" />
-              <Select.Item label="UX Research" value="ux" />
-              <Select.Item label="Backend Development" value="backend" />
+              <Select.Item label="Full Stack" value="Full Stack" />
+              <Select.Item label="Web Development" value="Web Development" />
+              <Select.Item label="UX Research" value="UX Research" />
+              <Select.Item label="Backend Development" value="Backend Development" />
             </Select>
           </FormControl>
           <FormControl my="3">
@@ -101,6 +102,7 @@ export default function AddList() {
               bold
               bg="muted.200"
               size="md"
+              onChangeText={(value) => handleChangeText("date", value)}
             />
           </FormControl>
           <FormControl >
@@ -109,9 +111,10 @@ export default function AddList() {
               placeholder="Description"
               w="100%"
               bg="muted.200"
+              onChangeText={(value) => handleChangeText("description", value)}
               />
           </FormControl>
-          <Button variant="danger" bg="error.600" w="100%" mt="10">
+          <Button variant="danger" bg="error.600" w="100%" mt="10" onPress={(e) => handleSubmit(e)}>
             <Text bold color="white">
               Add List
             </Text>
